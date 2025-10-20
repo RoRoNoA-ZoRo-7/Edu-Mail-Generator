@@ -1,4 +1,4 @@
-name: Paper Minecraft Server with Ngrok
+name: Vanilla Minecraft Server with Ngrok
 
 on:
   workflow_dispatch:
@@ -26,18 +26,18 @@ jobs:
       run: |
         ngrok config add-authtoken $NGROK_AUTH_TOKEN
 
-    - name: Download and Set Up Paper Server
+    - name: Download Vanilla Minecraft Server
       run: |
         mkdir server
         cd server
-        curl -o paper.jar https://api.papermc.io/v2/projects/paper/versions/1.20.3/builds/463/downloads/paper-1.20.3-463.jar
+        curl -o server.jar https://launcher.mojang.com/v1/objects/0f67dd8cf618249ceadf5f1f5e5b0d52f2c020ec/server.jar
         echo "eula=true" > eula.txt
 
     - name: Start Minecraft Server and Ngrok Tunnel
       run: |
         cd server
-        java -Xmx1G -Xms1G -jar paper.jar nogui &
-        sleep 20
+        java -Xmx1G -Xms1G -jar server.jar nogui &
+        sleep 30
         ngrok tcp 25565 > ../ngrok.log &
         sleep 10
 
@@ -46,8 +46,8 @@ jobs:
         curl -s http://127.0.0.1:4040/api/tunnels > tunnels.json
         cat tunnels.json
 
-    - name: Extract and Display Ngrok TCP Address
+    - name: Show Ngrok IP and Port
       run: |
-        echo "Minecraft Server is online! IP and Port:"
+        echo "Server is online! Use this to connect:"
         addr=$(jq -r '.tunnels[0].public_url' < tunnels.json)
-        echo "Connect using: $addr"
+        echo "▶ Minecraft Address: $addr"
