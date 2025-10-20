@@ -12,6 +12,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
+        distribution: 'temurin'
 
     - name: Install Ngrok
       run: |
@@ -35,10 +36,8 @@ jobs:
     - name: Start Minecraft Server and Ngrok Tunnel
       run: |
         cd server
-        # Start Minecraft server in the background
         java -Xmx1G -Xms1G -jar paper.jar nogui &
         sleep 20
-        # Start Ngrok TCP tunnel on port 25565
         ngrok tcp 25565 > ../ngrok.log &
         sleep 10
 
@@ -50,6 +49,5 @@ jobs:
     - name: Extract and Display Ngrok TCP Address
       run: |
         echo "Minecraft Server is online! IP and Port:"
-        # Extract the public TCP address
         addr=$(jq -r '.tunnels[0].public_url' < tunnels.json)
         echo "Connect using: $addr"
